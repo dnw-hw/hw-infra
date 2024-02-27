@@ -1,0 +1,76 @@
+version: '3.9'
+
+services:
+  os1:
+    image: opensearchproject/opensearch:latest
+    container_name: os1
+    environment:
+      - cluster.name=docker-cluster
+      - cluster.initial_master_nodes=os1
+      - node.name=os1
+      - discovery.seed_hosts=os2,os3
+      - bootstrap.memory_lock=true
+      - node.roles=master,data
+      - "OPENSEARCH_JAVA_OPTS=-Xms2g -Xmx2g"
+      - "DISABLE_INSTALL_DEMO_CONFIG=true"
+      - "DISABLE_SECURITY_PLUGIN=true"
+      - 'TZ/Asia/Seoul'
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+
+  os2:
+    image: opensearchproject/opensearch:latest
+    container_name: os2
+    environment:
+      - cluster.name=docker-cluster
+      - node.name=os2
+      - discovery.seed_hosts=os1,os3
+      - bootstrap.memory_lock=true
+      - node.roles=data,ingest,ml
+      - "OPENSEARCH_JAVA_OPTS=-Xms2g -Xmx2g"
+      - "DISABLE_INSTALL_DEMO_CONFIG=true"
+      - "DISABLE_SECURITY_PLUGIN=true"
+      - 'TZ/Asia/Seoul'
+    ports:
+      - "9201:9200"
+      - "9601:9600"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+
+  os3:
+    image: opensearchproject/opensearch:latest
+    container_name: os3
+    environment:
+      - cluster.name=docker-cluster
+      - node.name=os3
+      - discovery.seed_hosts=os1,os2
+      - bootstrap.memory_lock=true
+      - node.roles=data,ingest,ml
+      - "OPENSEARCH_JAVA_OPTS=-Xms2g -Xmx2g"
+      - "DISABLE_INSTALL_DEMO_CONFIG=true"
+      - "DISABLE_SECURITY_PLUGIN=true"
+      - 'TZ/Asia/Seoul'
+    ports:
+      - "9202:9200"
+      - "9602:9600"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+
+  dashboard:
+    image: opensearchproject/opensearch-dashboards:latest
+    container_name: dashboard
+    ports:
+      - "5601:5601"
+    environment:
+      - 'OPENSEARCH_HOSTS=["http://os1:9200"]'
+      - "DISABLE_SECURITY_DASHBOARDS_PLUGIN=true"
+      - 'TZ/Asia/Seoul'
