@@ -1,0 +1,32 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16.3
+    container_name: postgres
+    shm_size: 128mb
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postdb
+    ports:
+      - "5432:5432"
+
+  pgvector:
+    image: pgvector/pgvector:pg16
+    container_name: pgvector
+    ports:
+      - "8081:8081"
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/postdb
+      PGVECTOR_API_PORT: 8081
+      PGVECTOR_API_HOST:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postdb
+
+  pgadmin:
+    image: adminer
+    container_name: pgadmin
+    ports:
+      - "8080:8080"
